@@ -1,4 +1,36 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { TripForm } from "@/components/trip-form";
+import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
+
 export default function NewTripPage() {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleSubmit = async (data: {
+    start_station: string;
+    end_station: string;
+    travel_date: string;
+    travel_time: string;
+    is_repeating: boolean;
+    repeat_days: number[];
+  }) => {
+    const { error } = await supabase.from("trips").insert({
+      user_id: (await supabase.auth.getUser()).data.user?.id,
+      ...data,
+    });
+
+    if (error) {
+      toast.error("Failed to add trip. Please try again.");
+      return;
+    }
+
+    toast.success("Trip added! Others can now find you.");
+    router.push("/trips");
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -8,7 +40,10 @@ export default function NewTripPage() {
         </p>
       </div>
       <div className="rounded-xl bg-white p-4 shadow-sm md:p-6">
-        <p className="text-sm text-[#666666]">Trip form coming in Phase 3...</p>
+        <TripForm
+          onSubmit={handleSubmit}
+          onCancel={() => router.back()}
+        />
       </div>
     </div>
   );

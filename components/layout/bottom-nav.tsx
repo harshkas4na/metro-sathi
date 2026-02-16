@@ -27,7 +27,7 @@ export function BottomNav({ pendingCount = 0 }: BottomNavProps) {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white pb-safe md:hidden">
+    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white pb-safe md:hidden">
       <div className="flex h-16 items-center justify-around">
         {navItems.map((item) => {
           const isActive =
@@ -58,7 +58,10 @@ export function BottomNav({ pendingCount = 0 }: BottomNavProps) {
               >
                 <Icon size={item.isCenter ? 24 : 22} />
                 {item.href === "/connections" && pendingCount > 0 && (
-                  <span className="absolute -top-0.5 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#EF4444] px-1 text-[10px] font-bold text-white">
+                  <span
+                    aria-label={`${pendingCount} pending requests`}
+                    className="absolute -top-0.5 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#EF4444] px-1 text-[10px] font-bold text-white"
+                  >
                     {pendingCount > 9 ? "9+" : pendingCount}
                   </span>
                 )}

@@ -42,7 +42,7 @@ export function DesktopSidebar({ pendingCount = 0 }: DesktopSidebarProps) {
       </div>
 
       {/* Nav Items */}
-      <nav className="flex flex-1 flex-col gap-1 p-4">
+      <nav aria-label="Main navigation" className="flex flex-1 flex-col gap-1 p-4">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
