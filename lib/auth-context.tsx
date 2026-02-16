@@ -23,8 +23,8 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
   loading: true,
-  refreshProfile: async () => {},
-  signOut: async () => {},
+  refreshProfile: async () => { },
+  signOut: async () => { },
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -35,12 +35,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = useCallback(
     async (userId: string) => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
-      setProfile(data);
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .single();
+
+        if (error && error.code !== "PGRST116") {
+          console.error("Error fetching profile:", error);
+          return;
+        }
+
+        if (data) {
+          setProfile(data);
+        } else {
+          // Profile doesn't exist, create it
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (user && user.id === userId) {
+            const newProfile = {
+              id: userId,
+              email: user.email!,
+              name:
+                user.user_metadata?.full_name ||
+                user.user_metadata?.name ||
+                user.email?.split("@")[0] ||
+                "User",
+              phone_visible: false,
+              onboarding_completed: false,
+            };
+
+            const { data: createdProfile, error: insertError } = await supabase
+              .from("profiles")
+              .insert(newProfile)
+              .select()
+              .single();
+
+            if (insertError) {
+              console.error("Error creating profile:", insertError);
+            } else {
+              setProfile(createdProfile);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Unexpected error in fetchProfile:", err);
+      }
     },
     [supabase]
   );

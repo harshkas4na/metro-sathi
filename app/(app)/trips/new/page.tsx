@@ -2,12 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { TripForm } from "@/components/trip-form";
-import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
 export default function NewTripPage() {
   const router = useRouter();
-  const supabase = createClient();
 
   const handleSubmit = async (data: {
     start_station: string;
@@ -17,13 +15,15 @@ export default function NewTripPage() {
     is_repeating: boolean;
     repeat_days: number[];
   }) => {
-    const { error } = await supabase.from("trips").insert({
-      user_id: (await supabase.auth.getUser()).data.user?.id,
-      ...data,
+    const res = await fetch("/api/trips", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     });
 
-    if (error) {
-      toast.error("Failed to add trip. Please try again.");
+    if (!res.ok) {
+      const err = await res.json();
+      toast.error(err.error || "Failed to add trip. Please try again.");
       return;
     }
 

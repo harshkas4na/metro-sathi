@@ -6,6 +6,7 @@ import {
   Home,
   Search,
   PlusCircle,
+  UserSearch,
   Users,
   UserCircle,
   TrainFront,
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/search", label: "Find Companions", icon: Search },
   { href: "/trips/new", label: "Add Trip", icon: PlusCircle },
   { href: "/trips", label: "My Trips", icon: MapPin },
+  { href: "/people", label: "Find People", icon: UserSearch },
   { href: "/connections", label: "Connections", icon: Users },
   { href: "/profile", label: "Profile", icon: UserCircle },
 ];

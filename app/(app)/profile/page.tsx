@@ -30,6 +30,8 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import type { Gender } from "@/lib/types";
 
+// Browser client only used for avatar Storage upload
+
 export default function ProfilePage() {
   const { profile, refreshProfile, signOut, loading } = useAuth();
   const supabase = createClient();
@@ -100,12 +102,18 @@ export default function ProfilePage() {
       data: { publicUrl },
     } = supabase.storage.from("avatars").getPublicUrl(filePath);
 
-    await supabase
-      .from("profiles")
-      .update({ profile_pic_url: `${publicUrl}?t=${Date.now()}` })
-      .eq("id", profile.id);
+    const picUrl = `${publicUrl}?t=${Date.now()}`;
+    const res = await fetch("/api/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profile_pic_url: picUrl }),
+    });
 
     setUploading(false);
+    if (!res.ok) {
+      toast.error("Failed to update profile picture");
+      return;
+    }
     toast.success("Photo updated");
   };
 
@@ -127,9 +135,10 @@ export default function ProfilePage() {
     }
 
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .update({
+    const res = await fetch("/api/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         name: name.trim(),
         age: ageNum,
         gender,
@@ -138,10 +147,10 @@ export default function ProfilePage() {
         twitter_handle: twitter.trim() || null,
         phone: phone.trim() || null,
         phone_visible: phoneVisible,
-      })
-      .eq("id", profile.id);
+      }),
+    });
 
-    if (error) {
+    if (!res.ok) {
       toast.error("Failed to save profile");
       setSaving(false);
       return;

@@ -6,6 +6,7 @@ import {
   Home,
   Search,
   PlusCircle,
+  UserSearch,
   Users,
   UserCircle,
 } from "lucide-react";
@@ -15,8 +16,8 @@ const navItems = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/search", label: "Search", icon: Search },
   { href: "/trips/new", label: "Add Trip", icon: PlusCircle, isCenter: true },
+  { href: "/people", label: "People", icon: UserSearch },
   { href: "/connections", label: "Connects", icon: Users },
-  { href: "/profile", label: "Profile", icon: UserCircle },
 ];
 
 interface BottomNavProps {

@@ -133,16 +133,18 @@ export default function SearchPage() {
     if (!user) return;
 
     setConnectingId(recipientId);
-    const { error } = await supabase.from("connections").insert({
-      requester_id: user.id,
-      recipient_id: recipientId,
+    const res = await fetch("/api/connections", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ recipient_id: recipientId }),
     });
 
-    if (error) {
-      if (error.code === "23505") {
+    if (!res.ok) {
+      const data = await res.json();
+      if (res.status === 409) {
         toast.error("Connection request already sent");
       } else {
-        toast.error("Failed to send request");
+        toast.error(data.error || "Failed to send request");
       }
     } else {
       toast.success("Connection request sent!");

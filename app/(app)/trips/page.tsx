@@ -20,7 +20,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TripForm } from "@/components/trip-form";
-import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import Link from "next/link";
 import type { Trip } from "@/lib/types";
@@ -64,29 +63,19 @@ function groupTripsByDate(trips: Trip[]) {
 
 export default function TripsPage() {
   const router = useRouter();
-  const supabase = createClient();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchTrips = useCallback(async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("trips")
-      .select("*")
-      .eq("user_id", user.id)
-      .gte("travel_date", new Date().toISOString().split("T")[0])
-      .order("travel_date", { ascending: true })
-      .order("travel_time", { ascending: true });
-
-    setTrips(data ?? []);
+    const res = await fetch("/api/trips");
+    if (res.ok) {
+      const data = await res.json();
+      setTrips(data ?? []);
+    }
     setLoading(false);
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     fetchTrips();
@@ -94,8 +83,8 @@ export default function TripsPage() {
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
-    const { error } = await supabase.from("trips").delete().eq("id", id);
-    if (error) {
+    const res = await fetch(`/api/trips/${id}`, { method: "DELETE" });
+    if (!res.ok) {
       toast.error("Failed to delete trip");
     } else {
       toast.success("Trip deleted");
@@ -114,12 +103,13 @@ export default function TripsPage() {
   }) => {
     if (!editingTrip) return;
 
-    const { error } = await supabase
-      .from("trips")
-      .update(data)
-      .eq("id", editingTrip.id);
+    const res = await fetch(`/api/trips/${editingTrip.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
 
-    if (error) {
+    if (!res.ok) {
       toast.error("Failed to update trip");
       return;
     }
