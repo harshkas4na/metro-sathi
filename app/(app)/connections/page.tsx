@@ -204,7 +204,7 @@ function ConnectionsPageContent() {
       {/* Mobile: Full view or Chat overlay */}
       <div className="md:hidden">
         {activeChatUser && activeChatConnection ? (
-          <div className="fixed inset-0 z-50 bg-[#F8F9FA]">
+          <div className="fixed inset-0 z-50 flex flex-col bg-[#F8F9FA]" style={{ height: "100dvh" }}>
             <ChatWindow
               connectionId={activeChatConnection.id}
               otherUser={activeChatUser}

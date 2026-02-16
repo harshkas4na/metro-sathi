@@ -35,20 +35,35 @@ export function ChatWindow({
   }, []);
 
   // Fetch messages
-  useEffect(() => {
-    const fetchMessages = async () => {
-      const res = await fetch(`/api/messages?connection_id=${connectionId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data);
-      } else {
-        toast.error("Failed to load messages");
-      }
-      setLoading(false);
-    };
+  const fetchMessages = useCallback(async () => {
+    const res = await fetch(`/api/messages?connection_id=${connectionId}`);
+    if (res.ok) {
+      const data = await res.json() as Message[];
+      setMessages((prev) => {
+        // Merge by ID: keep optimistic messages, add new ones
+        const merged = new Map<string, Message>();
+        for (const m of prev) merged.set(m.id, m);
+        for (const m of data) merged.set(m.id, m);
+        return Array.from(merged.values()).sort(
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+      });
+    } else if (loading) {
+      toast.error("Failed to load messages");
+    }
+    setLoading(false);
+  }, [connectionId, loading]);
 
+  // Initial fetch
+  useEffect(() => {
     fetchMessages();
-  }, [connectionId]);
+  }, [connectionId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Polling fallback for real-time messages (every 3s)
+  useEffect(() => {
+    const interval = setInterval(fetchMessages, 3000);
+    return () => clearInterval(interval);
+  }, [fetchMessages]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -270,7 +285,7 @@ export function ChatWindow({
       </div>
 
       {/* Input */}
-      <div className="border-t bg-white px-4 py-3">
+      <div className="border-t bg-white px-4 py-3 pb-safe">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
