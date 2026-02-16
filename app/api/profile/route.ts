@@ -6,7 +6,10 @@ export async function GET() {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
+
+  console.log("[API /api/profile GET] user:", user?.id ?? "NULL", "| authError:", authError?.message ?? "none");
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -18,8 +21,10 @@ export async function GET() {
     .eq("id", user.id)
     .single();
 
+  console.log("[API /api/profile GET] query result:", data ? "found" : "null", "| error:", error?.message ?? "none", "| code:", error?.code ?? "none");
+
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
   }
 
   return NextResponse.json(data);

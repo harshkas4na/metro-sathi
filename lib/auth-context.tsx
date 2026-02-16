@@ -33,63 +33,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
-  const fetchProfile = useCallback(
-    async (userId: string) => {
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", userId)
-          .single();
-
-        if (error && error.code !== "PGRST116") {
-          console.error("Error fetching profile:", error);
-          return;
-        }
-
-        if (data) {
-          setProfile(data);
-        } else {
-          // Profile doesn't exist, create it
-          const {
-            data: { user },
-          } = await supabase.auth.getUser();
-          if (user && user.id === userId) {
-            const newProfile = {
-              id: userId,
-              email: user.email!,
-              name:
-                user.user_metadata?.full_name ||
-                user.user_metadata?.name ||
-                user.email?.split("@")[0] ||
-                "User",
-              phone_visible: false,
-              onboarding_completed: false,
-            };
-
-            const { data: createdProfile, error: insertError } = await supabase
-              .from("profiles")
-              .insert(newProfile)
-              .select()
-              .single();
-
-            if (insertError) {
-              console.error("Error creating profile:", insertError);
-            } else {
-              setProfile(createdProfile);
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Unexpected error in fetchProfile:", err);
+  const fetchProfile = useCallback(async () => {
+    try {
+      const res = await fetch("/api/profile");
+      if (res.ok) {
+        const data = await res.json();
+        setProfile(data);
+      } else {
+        console.error("[AUTH-CONTEXT] fetchProfile: API returned", res.status);
+        setProfile(null);
       }
-    },
-    [supabase]
-  );
+    } catch (err) {
+      console.error("[AUTH-CONTEXT] fetchProfile error:", err);
+      setProfile(null);
+    }
+  }, []);
 
   const refreshProfile = useCallback(async () => {
     if (user) {
-      await fetchProfile(user.id);
+      await fetchProfile();
     }
   }, [user, fetchProfile]);
 
@@ -101,16 +63,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   useEffect(() => {
+    let mounted = true;
+
     const getSession = async () => {
+      console.log("[AUTH-CONTEXT] getSession: fetching...");
       const {
         data: { session },
       } = await supabase.auth.getSession();
       const currentUser = session?.user ?? null;
+      console.log("[AUTH-CONTEXT] getSession: user =", currentUser ? currentUser.id : "NULL");
+
+      if (!mounted) return;
+
       setUser(currentUser);
-      if (currentUser) {
-        await fetchProfile(currentUser.id);
-      }
       setLoading(false);
+
+      // Fetch profile in background — don't block loading
+      if (currentUser) {
+        fetchProfile();
+      }
     };
 
     getSession();
@@ -119,16 +90,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const currentUser = session?.user ?? null;
+      console.log("[AUTH-CONTEXT] onAuthStateChange: event=", _event, "| user =", currentUser ? currentUser.id : "NULL");
+
+      if (!mounted) return;
+
       setUser(currentUser);
+      setLoading(false);
+
       if (currentUser) {
-        await fetchProfile(currentUser.id);
+        fetchProfile();
       } else {
         setProfile(null);
       }
-      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [supabase, fetchProfile]);
 
   return (
