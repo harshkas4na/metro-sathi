@@ -12,6 +12,7 @@ import {
   Save,
   X,
   AtSign,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -189,11 +190,11 @@ export default function ProfilePage() {
     avatarPreview || profile.profile_pic_url;
   const initials = profile.name
     ? profile.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
     : "?";
 
   // ─── View Mode ───
@@ -229,13 +230,12 @@ export default function ProfilePage() {
             {profile.age && <span>{profile.age} years old</span>}
             {profile.gender && (
               <span
-                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                  profile.gender === "Male"
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${profile.gender === "Male"
                     ? "bg-[#DBEAFE] text-[#3B82F6]"
                     : profile.gender === "Female"
                       ? "bg-[#FCE7F3] text-[#EC4899]"
                       : "bg-[#EDE9FE] text-[#8B5CF6]"
-                }`}
+                  }`}
               >
                 {profile.gender}
               </span>
@@ -386,6 +386,23 @@ export default function ProfilePage() {
             />
             <p className="text-xs text-[#999999]">
               Unique ID so others can find you. Only lowercase letters, numbers, and underscores.
+            </p>
+          </div>
+
+          {/* Email (read-only) */}
+          <div className="space-y-2">
+            <Label htmlFor="edit-email" className="flex items-center gap-1.5">
+              <Mail size={14} />
+              Email
+            </Label>
+            <Input
+              id="edit-email"
+              value={profile.email}
+              disabled
+              className="bg-[#F1F3F5] text-[#666666] cursor-not-allowed"
+            />
+            <p className="text-xs text-[#999999]">
+              This is your sign-in email and cannot be changed.
             </p>
           </div>
 
