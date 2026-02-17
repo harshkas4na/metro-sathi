@@ -13,7 +13,6 @@ import {
   MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NotificationBell } from "@/components/notification-bell";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
@@ -22,7 +21,6 @@ const navItems = [
   { href: "/trips", label: "My Trips", icon: MapPin },
   { href: "/people", label: "Find People", icon: UserSearch },
   { href: "/connections", label: "Connections", icon: Users },
-  { href: "/profile", label: "Profile", icon: UserCircle },
 ];
 
 interface DesktopSidebarProps {
@@ -31,6 +29,7 @@ interface DesktopSidebarProps {
 
 export function DesktopSidebar({ pendingCount = 0 }: DesktopSidebarProps) {
   const pathname = usePathname();
+  const isProfileActive = pathname === "/profile" || pathname.startsWith("/profile");
 
   return (
     <aside className="fixed left-0 top-0 hidden h-screen w-60 border-r bg-white md:flex md:flex-col">
@@ -77,10 +76,20 @@ export function DesktopSidebar({ pendingCount = 0 }: DesktopSidebarProps) {
         })}
       </nav>
 
-      {/* Bottom section */}
-      <div className="flex items-center justify-between border-t p-4">
-        <p className="text-xs text-[#999999]">Metro Connect v1.0</p>
-        <NotificationBell />
+      {/* Profile at bottom */}
+      <div className="border-t p-4">
+        <Link
+          href="/profile"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            isProfileActive
+              ? "bg-[#E6F2FF] text-[#0066CC]"
+              : "text-[#666666] hover:bg-[#F8F9FA] hover:text-[#1A1A1A]"
+          )}
+        >
+          <UserCircle size={20} />
+          <span>Profile</span>
+        </Link>
       </div>
     </aside>
   );
