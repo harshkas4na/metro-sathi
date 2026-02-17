@@ -167,21 +167,38 @@ export default function ProfilePage() {
     toast.success("Profile updated");
   };
 
-  if (loading) {
+  if (loading || !profile) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-[#0066CC]" />
-      </div>
-    );
-  }
+      <div className="space-y-6 animate-pulse">
+        {/* Profile Header Skeleton */}
+        <div className="flex flex-col items-center rounded-xl bg-white p-6 shadow-sm">
+          {/* Avatar */}
+          <div className="mb-3 h-24 w-24 rounded-full bg-[#E0E0E0]" />
+          {/* Name */}
+          <div className="h-6 w-40 rounded-md bg-[#E0E0E0]" />
+          {/* User ID */}
+          <div className="mt-2 h-4 w-28 rounded-md bg-[#E0E0E0]" />
+          {/* Age + Gender */}
+          <div className="mt-2 flex items-center gap-2">
+            <div className="h-4 w-20 rounded-md bg-[#E0E0E0]" />
+            <div className="h-5 w-12 rounded-full bg-[#E0E0E0]" />
+          </div>
+          {/* Bio */}
+          <div className="mt-3 h-4 w-48 rounded-md bg-[#E0E0E0]" />
+        </div>
 
-  if (!profile) {
-    return (
-      <div className="flex h-64 flex-col items-center justify-center gap-3">
-        <p className="text-sm text-[#666666]">Profile not found</p>
-        <Button onClick={signOut} variant="ghost" className="text-[#EF4444]">
-          Sign Out
-        </Button>
+        {/* Settings Skeleton */}
+        <div className="rounded-xl bg-white shadow-sm">
+          <div className="flex items-center gap-3 px-4 py-4">
+            <div className="h-5 w-5 rounded bg-[#E0E0E0]" />
+            <div className="h-4 w-24 rounded-md bg-[#E0E0E0]" />
+          </div>
+          <Separator />
+          <div className="flex items-center gap-3 px-4 py-4">
+            <div className="h-5 w-5 rounded bg-[#E0E0E0]" />
+            <div className="h-4 w-16 rounded-md bg-[#E0E0E0]" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -231,10 +248,10 @@ export default function ProfilePage() {
             {profile.gender && (
               <span
                 className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${profile.gender === "Male"
-                    ? "bg-[#DBEAFE] text-[#3B82F6]"
-                    : profile.gender === "Female"
-                      ? "bg-[#FCE7F3] text-[#EC4899]"
-                      : "bg-[#EDE9FE] text-[#8B5CF6]"
+                  ? "bg-[#DBEAFE] text-[#3B82F6]"
+                  : profile.gender === "Female"
+                    ? "bg-[#FCE7F3] text-[#EC4899]"
+                    : "bg-[#EDE9FE] text-[#8B5CF6]"
                   }`}
               >
                 {profile.gender}
