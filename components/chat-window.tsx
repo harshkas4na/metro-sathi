@@ -35,7 +35,6 @@ export function ChatWindow({
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
     // Use setTimeout to ensure DOM has updated before scrolling
@@ -45,16 +44,14 @@ export function ChatWindow({
   }, []);
 
   // Track visual viewport height for mobile keyboard handling
+  // Set on documentElement so the parent .chat-fullscreen class can read it
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
     const viewport = window.visualViewport;
     if (!viewport) return;
 
     const handleResize = () => {
-      // Set CSS variable to the actual visible height
-      container.style.setProperty(
+      // Set CSS variable on :root so .chat-fullscreen parent can use it
+      document.documentElement.style.setProperty(
         "--visual-viewport-height",
         `${viewport.height}px`
       );
@@ -71,6 +68,8 @@ export function ChatWindow({
     return () => {
       viewport.removeEventListener("resize", handleResize);
       viewport.removeEventListener("scroll", handleResize);
+      // Clean up the CSS variable
+      document.documentElement.style.removeProperty("--visual-viewport-height");
     };
   }, [scrollToBottom]);
 
@@ -199,7 +198,7 @@ export function ChatWindow({
   const groupedMessages = groupByDate(messages);
 
   return (
-    <div ref={containerRef} className="flex h-full flex-col">
+    <div className="flex h-full flex-col">
       {/* Header - sticky so it stays visible when keyboard opens */}
       <div className="sticky top-0 z-10 flex shrink-0 items-center gap-3 border-b bg-white px-4 py-3">
         <button
@@ -334,8 +333,8 @@ export function ChatWindow({
                     {/* Bubble */}
                     <div
                       className={`max-w-[75%] rounded-2xl px-3.5 py-2 ${isMine
-                          ? "rounded-br-md bg-[#0066CC] text-white"
-                          : "rounded-bl-md bg-white text-[#1A1A1A] shadow-sm"
+                        ? "rounded-br-md bg-[#0066CC] text-white"
+                        : "rounded-bl-md bg-white text-[#1A1A1A] shadow-sm"
                         }`}
                     >
                       <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
