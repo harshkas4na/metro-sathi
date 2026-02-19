@@ -15,7 +15,6 @@ export const metadata: Metadata = {
     "Connect with fellow Delhi Metro travelers on your route. Find travel companions, stay safe, and make your commute social.",
   keywords: ["Delhi Metro", "travel buddy", "commute companion", "metro sathi"],
   icons: {
-    icon: "/logo/half-logo.png",
     apple: "/logo/half-logo.png",
   },
 };
