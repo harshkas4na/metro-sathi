@@ -65,30 +65,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    const getSession = async () => {
-      console.log("[AUTH-CONTEXT] getSession: fetching...");
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const currentUser = session?.user ?? null;
-      console.log("[AUTH-CONTEXT] getSession: user =", currentUser ? currentUser.id : "NULL");
-
-      if (!mounted) return;
-
-      setUser(currentUser);
-      setLoading(false);
-
-      // Fetch profile in background — don't block loading
-      if (currentUser) {
-        fetchProfile();
-      }
-    };
-
-    getSession();
-
+    // onAuthStateChange fires INITIAL_SESSION on mount with the correct session
+    // state read from cookies. This avoids the race condition where getSession()
+    // returns null before the browser client has hydrated the server-set cookies.
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       const currentUser = session?.user ?? null;
       console.log("[AUTH-CONTEXT] onAuthStateChange: event=", _event, "| user =", currentUser ? currentUser.id : "NULL");
 
