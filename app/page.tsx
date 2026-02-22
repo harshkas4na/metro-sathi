@@ -1,11 +1,25 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Users, Shield, MessageCircle } from "lucide-react";
+import { Users, Shield, MessageCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // When auth state resolves to a signed-in user (e.g. after OAuth redirect
+  // lands back here before the middleware cookie is validated), push to dashboard.
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/dashboard");
+    }
+  }, [user, loading, router]);
+
   const handleSignIn = async () => {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
@@ -15,6 +29,16 @@ export default function LandingPage() {
       },
     });
   };
+
+  // Show spinner while auth state is being determined so the sign-in
+  // button never flashes for an already-authenticated user.
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#0066CC] via-[#0052A3] to-[#7B3FF2]">
+        <Loader2 size={32} className="animate-spin text-white" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-[#0066CC] via-[#0052A3] to-[#7B3FF2]">
