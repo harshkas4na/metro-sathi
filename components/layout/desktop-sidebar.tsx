@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import {
   Home,
   Search,
@@ -9,7 +10,6 @@ import {
   UserSearch,
   Users,
   UserCircle,
-  TrainFront,
   MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -34,13 +34,15 @@ export function DesktopSidebar({ pendingCount = 0 }: DesktopSidebarProps) {
   return (
     <aside className="fixed left-0 top-0 hidden h-screen w-60 border-r bg-white md:flex md:flex-col">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2.5 border-b px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0066CC]">
-          <TrainFront size={18} className="text-white" />
-        </div>
-        <span className="text-lg font-semibold text-[#1A1A1A]">
-          Metro Connect
-        </span>
+      <div className="flex h-16 items-center border-b px-5">
+        <Image
+          src="/logo/full-logo.png"
+          alt="Metro Sathi"
+          width={220}
+          height={80}
+          className=""
+          priority
+        />
       </div>
 
       {/* Nav Items */}

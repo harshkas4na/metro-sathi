@@ -11,10 +11,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Metro Connect - Find Your Metro Travel Buddy",
+  title: "Metro Sathi - Find Your Metro Travel Buddy",
   description:
     "Connect with fellow Delhi Metro travelers on your route. Find travel companions, stay safe, and make your commute social.",
-  keywords: ["Delhi Metro", "travel buddy", "commute companion", "metro connect"],
+  keywords: ["Delhi Metro", "travel buddy", "commute companion", "metro sathi"],
+  icons: {
+    apple: "/logo/half-logo.png",
+  },
 };
 
 export const viewport: Viewport = {

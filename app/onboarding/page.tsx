@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Camera, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -155,6 +156,18 @@ export default function OnboardingPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F8F9FA] px-4 py-8">
       <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="mb-6 flex justify-center">
+          <Image
+            src="/logo/full-logo.png"
+            alt="Metro Sathi"
+            width={160}
+            height={48}
+            className="h-12 w-auto object-contain"
+            priority
+          />
+        </div>
+
         {/* Progress Bar */}
         <div className="mb-8 flex items-center justify-center gap-2">
           {[1, 2, 3].map((s) => (

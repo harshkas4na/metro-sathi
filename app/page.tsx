@@ -1,6 +1,7 @@
 "use client";
 
-import { TrainFront, Users, Shield, MessageCircle } from "lucide-react";
+import Image from "next/image";
+import { Users, Shield, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,8 +23,15 @@ export default function LandingPage() {
         <div className="w-full max-w-md space-y-8">
           {/* Logo & Header */}
           <div className="text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
-              <TrainFront size={40} className="text-white" />
+            <div className="mx-auto mb-6 flex items-center justify-center">
+              <Image
+                src="/logo/full-logo.png"
+                alt="Metro Sathi"
+                width={220}
+                height={80}
+                className="h-20 w-auto object-contain drop-shadow-lg"
+                priority
+              />
             </div>
             <h1 className="text-[32px] font-bold leading-[38px] tracking-tight text-white md:text-5xl md:leading-[56px]">
               Find Your Metro
