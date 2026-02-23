@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
 import "./globals.css";
@@ -34,6 +35,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key="aiybReG6/Ra/vUfmFnYmew"
+          strategy="afterInteractive"
+        />
+      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
           {children}
